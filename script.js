@@ -62,11 +62,16 @@ function renderGridWithFillText(ctx) {
     }
 }
 
-function renderTests() {
+function yieldToNextFrame() {
+    return new Promise((resolve) => requestAnimationFrame(resolve));
+}
+
+async function renderTests() {
     const renderTimesDiv = document.getElementById("renderTimes");
     renderTimesDiv.innerHTML = "";
 
-    // Usage Example
+    await yieldToNextFrame();
+    
     const canvas = document.getElementById("myCanvas");
     const ctx = canvas.getContext("2d");
 
@@ -82,6 +87,9 @@ function renderTests() {
     const endGlyphRender = performance.now();
     const glyphRenderTime = endGlyphRender - startGlyphRender;
     renderTimesDiv.innerHTML += `<div>GlyphRenderer time:</div><div>${glyphRenderTime.toFixed(2)} ms</div>`;
+
+    // Yield to next frame
+    await yieldToNextFrame();
 
     // Render another canvas below the first one but use ctx.fillText instead
     const canvas2 = document.getElementById("myCanvas2");

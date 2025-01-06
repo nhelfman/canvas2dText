@@ -26,6 +26,23 @@ function yieldToNextFrame() {
     return new Promise((resolve) => requestAnimationFrame(resolve));
 }
 
+async function measureRenderTime(ctx, renderFunction) {
+    await yieldToNextFrame();
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    const startRender = performance.now();
+    renderFunction(ctx);
+    const endRender = performance.now();
+    return endRender - startRender;
+}
+
+function updateAverageTimes(renderTimesDiv, glyphRenderTimes, fillTextRenderTimes) {
+    const avgGlyphRenderTime = glyphRenderTimes.reduce((a, b) => a + b, 0) / glyphRenderTimes.length;
+    const avgFillTextRenderTime = fillTextRenderTimes.reduce((a, b) => a + b, 0) / fillTextRenderTimes.length;
+
+    renderTimesDiv.innerHTML = `<div>GlyphRenderer average time:</div><div>${avgGlyphRenderTime.toFixed(2)} ms</div>`;
+    renderTimesDiv.innerHTML += `<div>fillText average time:</div><div>${avgFillTextRenderTime.toFixed(2)} ms</div>`;
+}
+
 async function renderTests(iterations = 50) {
     const renderTimesDiv = document.getElementById("renderTimes");
     renderTimesDiv.innerHTML = "";
@@ -42,37 +59,13 @@ async function renderTests(iterations = 50) {
     let fillTextRenderTimes = [];
 
     for (let i = 0; i < iterations; i++) {
-        await yieldToNextFrame();
-
-        // Clear canvas
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Measure render time for GlyphRenderer
-        const startGlyphRender = performance.now();
-        renderGridWithGlyphRenderer(ctx);
-        const endGlyphRender = performance.now();
-        const glyphRenderTime = endGlyphRender - startGlyphRender;
+        const glyphRenderTime = await measureRenderTime(ctx, renderGridWithGlyphRenderer);
         glyphRenderTimes.push(glyphRenderTime);
 
-        // Yield to next frame
-        await yieldToNextFrame();
-
-        // Clear canvas
-        ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
-
-        // Measure render time for fillText
-        const startFillTextRender = performance.now();
-        renderGridWithFillText(ctx2);
-        const endFillTextRender = performance.now();
-        const fillTextRenderTime = endFillTextRender - startFillTextRender;
+        const fillTextRenderTime = await measureRenderTime(ctx2, renderGridWithFillText);
         fillTextRenderTimes.push(fillTextRenderTime);
 
-        // Update average times
-        const avgGlyphRenderTime = glyphRenderTimes.reduce((a, b) => a + b, 0) / glyphRenderTimes.length;
-        const avgFillTextRenderTime = fillTextRenderTimes.reduce((a, b) => a + b, 0) / fillTextRenderTimes.length;
-
-        renderTimesDiv.innerHTML = `<div>GlyphRenderer average time:</div><div>${avgGlyphRenderTime.toFixed(2)} ms</div>`;
-        renderTimesDiv.innerHTML += `<div>fillText average time:</div><div>${avgFillTextRenderTime.toFixed(2)} ms</div>`;
+        updateAverageTimes(renderTimesDiv, glyphRenderTimes, fillTextRenderTimes);
     }
 }
 

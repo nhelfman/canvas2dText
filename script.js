@@ -26,49 +26,59 @@ function yieldToNextFrame() {
     return new Promise((resolve) => requestAnimationFrame(resolve));
 }
 
-async function renderTests() {
+async function renderTests(iterations = 50) {
     const renderTimesDiv = document.getElementById("renderTimes");
     renderTimesDiv.innerHTML = "";
 
-    await yieldToNextFrame();
-    
     const canvas = document.getElementById("myCanvas");
     const ctx = canvas.getContext("2d");
+    const canvas2 = document.getElementById("myCanvas2");
+    const ctx2 = canvas2.getContext("2d");
 
     // Initialize with desired font and color
     GlyphRenderer.init(ctx, "16px monospace", "black");
 
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let glyphRenderTimes = [];
+    let fillTextRenderTimes = [];
 
-    // Measure render time for GlyphRenderer
-    const startGlyphRender = performance.now();
-    renderGridWithGlyphRenderer(ctx);
-    const endGlyphRender = performance.now();
-    const glyphRenderTime = endGlyphRender - startGlyphRender;
-    renderTimesDiv.innerHTML += `<div>GlyphRenderer time:</div><div>${glyphRenderTime.toFixed(2)} ms</div>`;
+    for (let i = 0; i < iterations; i++) {
+        await yieldToNextFrame();
 
-    // Yield to next frame
-    await yieldToNextFrame();
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Render another canvas below the first one but use ctx.fillText instead
-    const canvas2 = document.getElementById("myCanvas2");
-    const ctx2 = canvas2.getContext("2d");
+        // Measure render time for GlyphRenderer
+        const startGlyphRender = performance.now();
+        renderGridWithGlyphRenderer(ctx);
+        const endGlyphRender = performance.now();
+        const glyphRenderTime = endGlyphRender - startGlyphRender;
+        glyphRenderTimes.push(glyphRenderTime);
 
-    // Clear canvas
-    ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+        // Yield to next frame
+        await yieldToNextFrame();
 
-    // Measure render time for fillText
-    const startFillTextRender = performance.now();
-    renderGridWithFillText(ctx2);
-    const endFillTextRender = performance.now();
-    const fillTextRenderTime = endFillTextRender - startFillTextRender;
-    renderTimesDiv.innerHTML += `<div>fillText time:</div><div>${fillTextRenderTime.toFixed(2)} ms</div>`;
+        // Clear canvas
+        ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+
+        // Measure render time for fillText
+        const startFillTextRender = performance.now();
+        renderGridWithFillText(ctx2);
+        const endFillTextRender = performance.now();
+        const fillTextRenderTime = endFillTextRender - startFillTextRender;
+        fillTextRenderTimes.push(fillTextRenderTime);
+
+        // Update average times
+        const avgGlyphRenderTime = glyphRenderTimes.reduce((a, b) => a + b, 0) / glyphRenderTimes.length;
+        const avgFillTextRenderTime = fillTextRenderTimes.reduce((a, b) => a + b, 0) / fillTextRenderTimes.length;
+
+        renderTimesDiv.innerHTML = `<div>GlyphRenderer average time:</div><div>${avgGlyphRenderTime.toFixed(2)} ms</div>`;
+        renderTimesDiv.innerHTML += `<div>fillText average time:</div><div>${avgFillTextRenderTime.toFixed(2)} ms</div>`;
+    }
 }
 
 window.addEventListener('load', function() {
     renderTests();
 
     const rerenderButton = document.getElementById("rerenderButton");
-    rerenderButton.addEventListener("click", renderTests);
+    rerenderButton.addEventListener("click", () => renderTests(10));
 });

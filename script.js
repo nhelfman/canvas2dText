@@ -3,11 +3,18 @@ import GlyphRenderer from './glyphRenderer.js';
 // Add your JavaScript code here
 console.log("JavaScript file is linked successfully.");
 
+// Helper function to get a random character
+function getRandomCharacter() {
+    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    return characters[Math.floor(Math.random() * characters.length)];
+}
+
 // Render text
 function renderGridWithGlyphRenderer(ctx) {
+    const char = getRandomCharacter();
     for (let i = 0; i < 30; i++) {
         for (let j = 0; j < 28; j++) {
-            GlyphRenderer.render(ctx, `c: ${i}_${j}`, i * 80, j * 20);
+            GlyphRenderer.render(ctx, `${char}: ${i}_${j}`, i * 80, j * 20);
         }
     }
 }
@@ -15,9 +22,10 @@ function renderGridWithGlyphRenderer(ctx) {
 function renderGridWithFillText(ctx) {
     ctx.font = "16px monospace";
     ctx.fillStyle = "black";
+    const char = getRandomCharacter();
     for (let i = 0; i < 30; i++) {
         for (let j = 0; j < 28; j++) {
-            ctx.fillText(`c: ${i}_${j}`, i * 80, j * 20 + 12);
+            ctx.fillText(`${char}: ${i}_${j}`, i * 80, j * 20 + 12);
         }
     }
 }
@@ -35,7 +43,7 @@ async function measureRenderTime(ctx, renderFunction) {
     return endRender - startRender;
 }
 
-function updateAverageTimes(renderTimesDiv, glyphRenderTimes, fillTextRenderTimes, iteration, totalIterations) {
+function updateAverageTimes(glyphRenderTimes, fillTextRenderTimes, iteration, totalIterations) {
     const avgGlyphRenderTime = glyphRenderTimes.reduce((a, b) => a + b, 0) / glyphRenderTimes.length;
     const avgFillTextRenderTime = fillTextRenderTimes.reduce((a, b) => a + b, 0) / fillTextRenderTimes.length;
 
@@ -51,10 +59,6 @@ function updateAverageTimes(renderTimesDiv, glyphRenderTimes, fillTextRenderTime
 }
 
 async function renderTests(iterations = 50) {
-    const renderTimesDiv = document.getElementById("renderTimes");
-    // Remove this line to keep the structure intact
-    // renderTimesDiv.innerHTML = "";
-
     const canvas = document.getElementById("myCanvas");
     const ctx = canvas.getContext("2d");
     const canvas2 = document.getElementById("myCanvas2");
@@ -73,7 +77,7 @@ async function renderTests(iterations = 50) {
         const fillTextRenderTime = await measureRenderTime(ctx2, renderGridWithFillText);
         fillTextRenderTimes.push(fillTextRenderTime);
 
-        updateAverageTimes(renderTimesDiv, glyphRenderTimes, fillTextRenderTimes, i + 1, iterations);
+        updateAverageTimes(glyphRenderTimes, fillTextRenderTimes, i + 1, iterations);
     }
 }
 

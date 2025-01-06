@@ -35,17 +35,25 @@ async function measureRenderTime(ctx, renderFunction) {
     return endRender - startRender;
 }
 
-function updateAverageTimes(renderTimesDiv, glyphRenderTimes, fillTextRenderTimes) {
+function updateAverageTimes(renderTimesDiv, glyphRenderTimes, fillTextRenderTimes, iteration, totalIterations) {
     const avgGlyphRenderTime = glyphRenderTimes.reduce((a, b) => a + b, 0) / glyphRenderTimes.length;
     const avgFillTextRenderTime = fillTextRenderTimes.reduce((a, b) => a + b, 0) / fillTextRenderTimes.length;
 
-    renderTimesDiv.innerHTML = `<div>GlyphRenderer average time:</div><div>${avgGlyphRenderTime.toFixed(2)} ms</div>`;
-    renderTimesDiv.innerHTML += `<div>fillText average time:</div><div>${avgFillTextRenderTime.toFixed(2)} ms</div>`;
+    const currentIterationElem = document.getElementById("currentIteration");
+    const glyphRenderTimeElem = document.getElementById("glyphRenderTime");
+    const fillTextRenderTimeElem = document.getElementById("fillTextRenderTime");
+
+    if (currentIterationElem && glyphRenderTimeElem && fillTextRenderTimeElem) {
+        currentIterationElem.textContent = `${iteration} / ${totalIterations}`;
+        glyphRenderTimeElem.textContent = `${avgGlyphRenderTime.toFixed(2)} ms`;
+        fillTextRenderTimeElem.textContent = `${avgFillTextRenderTime.toFixed(2)} ms`;
+    }
 }
 
 async function renderTests(iterations = 50) {
     const renderTimesDiv = document.getElementById("renderTimes");
-    renderTimesDiv.innerHTML = "";
+    // Remove this line to keep the structure intact
+    // renderTimesDiv.innerHTML = "";
 
     const canvas = document.getElementById("myCanvas");
     const ctx = canvas.getContext("2d");
@@ -65,13 +73,13 @@ async function renderTests(iterations = 50) {
         const fillTextRenderTime = await measureRenderTime(ctx2, renderGridWithFillText);
         fillTextRenderTimes.push(fillTextRenderTime);
 
-        updateAverageTimes(renderTimesDiv, glyphRenderTimes, fillTextRenderTimes);
+        updateAverageTimes(renderTimesDiv, glyphRenderTimes, fillTextRenderTimes, i + 1, iterations);
     }
 }
 
 window.addEventListener('load', function() {
-    renderTests();
+    renderTests(10);
 
     const rerenderButton = document.getElementById("rerenderButton");
-    rerenderButton.addEventListener("click", () => renderTests(10));
+    rerenderButton.addEventListener("click", () => renderTests(50));
 });

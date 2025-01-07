@@ -8,7 +8,7 @@
         body {
             font-family: Arial, sans-serif;
         }
-        #myCanvas, #myCanvas2 {
+        #myCanvas, #myCanvas2, #myCanvas3 {
             border: 1px solid black;
         }
         #renderTimes {
@@ -29,6 +29,8 @@
     <canvas id="myCanvas" width="2400" height="560"></canvas>
     <div>FillTextRenderer</div>
     <canvas id="myCanvas2" width="2400" height="560"></canvas>
+    <div>OpenTypeGlyphRenderer</div>
+    <canvas id="myCanvas3" width="2400" height="560"></canvas>
     <button id="rerenderButton">Re-run Render Tests</button>
     <div id="renderTimes">
         <div>Current iteration:</div>
@@ -37,6 +39,8 @@
         <div id="glyphRenderTime"></div>
         <div>fillText average time:</div>
         <div id="fillTextRenderTime"></div>
+        <div>OpenTypeGlyphRenderer average time:</div>
+        <div id="openTypeRenderTime"></div>
     </div>
     <script type="module" src="script.js"></script>
 </body>

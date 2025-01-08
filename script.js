@@ -65,7 +65,7 @@ async function renderTests(iterations = 50) {
     const ctx2 = canvas2.getContext("2d");
 
     // Initialize with desired font and color
-    GlyphRenderer.init(ctx, "16px monospace", "black");
+    GlyphRenderer.init("16px monospace", "black");
 
     let glyphRenderTimes = [];
     let fillTextRenderTimes = [];

@@ -8,8 +8,13 @@ The test renders on `canvas` element a grid of 30x28 cells with different text i
 We can see from the test page that `fillText` is much more performant than the custom renderer.
 It is unclear if there is a more optimize way to improve the custom renderer.
 
+The UI enables selecting different glyph rendering methods:
+- using `putImageData`
+- using `drawImage`
+- using `opentype.js` library (hacked version)
+
 Try the POC here:
 
 https://nhelfman.github.io/canvas2dText/
 
-![alt text](image-1.png)
+![alt text](image.png)

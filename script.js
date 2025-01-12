@@ -1,5 +1,6 @@
 import putImageGlyphRenderer from './putImageDataGlyphRenderer.js';
 import drawImageGlyphRenderer from './drawImageGlyphRenderer.js';
+import openTypeGlyphRenderer from './openTypeGlyphRenderer.js';
 
 // Add your JavaScript code here
 console.log("JavaScript file is linked successfully.");
@@ -25,6 +26,15 @@ function renderGridWithDrawImage(ctx) {
     for (let i = 0; i < 30; i++) {
         for (let j = 0; j < 28; j++) {
             drawImageGlyphRenderer.render(ctx, `${char}: ${i}_${j}`, i * 80, j * 20);
+        }
+    }
+}
+
+function renderGridWithOpenType(ctx) {
+    const char = getRandomCharacter();
+    for (let i = 0; i < 30; i++) {
+        for (let j = 0; j < 28; j++) {
+            openTypeGlyphRenderer.render(ctx, `${char}: ${i}_${j}`, i * 80, j * 20);
         }
     }
 }
@@ -83,6 +93,8 @@ async function renderTests(iterations = 50) {
     // Initialize with desired font and color
     putImageGlyphRenderer.init(ctx, "16px monospace", "black");
     drawImageGlyphRenderer.init(ctx, "16px monospace", "black");
+    await openTypeGlyphRenderer.init(ctx, './OpenSans-Regular.ttf', 14, "black");
+
 
     let glyphRenderTimes = [];
     let fillTextRenderTimes = [];
@@ -96,6 +108,9 @@ async function renderTests(iterations = 50) {
             break;
         case "drawImage":
             renderFunction = renderGridWithDrawImage;
+            break;
+        case "openType":
+            renderFunction = renderGridWithOpenType;
             break;
         default:
             throw new Error("Invalid test selected");
@@ -114,8 +129,6 @@ async function renderTests(iterations = 50) {
         fillTextRenderTimes.push(fillTextRenderTime);
         updateAverageTimes(glyphRenderTimes, fillTextRenderTimes, i + 1, iterations);
     }
-
-
 
     for (let i = 0; i < iterations; i++) {
         const glyphRenderTime = await measureRenderTime(ctx, renderFunction);

@@ -48,13 +48,19 @@ function updateAverageTimes(glyphRenderTimes, fillTextRenderTimes, iteration, to
     const avgFillTextRenderTime = fillTextRenderTimes.reduce((a, b) => a + b, 0) / fillTextRenderTimes.length;
 
     const currentIterationElem = document.getElementById("currentIteration");
+    if (currentIterationElem) {
+        currentIterationElem.textContent = `${iteration} / ${totalIterations}`;
+        updateAverageTimesText(`${avgGlyphRenderTime.toFixed(2)} ms`, `${avgFillTextRenderTime.toFixed(2)} ms`);
+    }
+}
+
+function updateAverageTimesText(glyphRenderText, fillTextRenderText, iteration, totalIterations) {
     const glyphRenderTimeElem = document.getElementById("glyphRenderTime");
     const fillTextRenderTimeElem = document.getElementById("fillTextRenderTime");
 
-    if (currentIterationElem && glyphRenderTimeElem && fillTextRenderTimeElem) {
-        currentIterationElem.textContent = `${iteration} / ${totalIterations}`;
-        glyphRenderTimeElem.textContent = `${avgGlyphRenderTime.toFixed(2)} ms`;
-        fillTextRenderTimeElem.textContent = `${avgFillTextRenderTime.toFixed(2)} ms`;
+    if (glyphRenderTimeElem && fillTextRenderTimeElem) {
+        glyphRenderTimeElem.textContent = glyphRenderText;
+        fillTextRenderTimeElem.textContent = fillTextRenderText;
     }
 }
 
@@ -70,15 +76,27 @@ async function renderTests(iterations = 50) {
     let glyphRenderTimes = [];
     let fillTextRenderTimes = [];
 
+    // warmup iterations
+    updateAverageTimesText("Warmup", "Warmup");
+    for (let i = 0; i < 10; i++) {
+        await measureRenderTime(ctx, renderGridWithGlyphRenderer);
+        await measureRenderTime(ctx2, renderGridWithFillText);
+    }
+
+    // run tests
+    for (let i = 0; i < iterations; i++) {
+        const fillTextRenderTime = await measureRenderTime(ctx2, renderGridWithFillText);
+        fillTextRenderTimes.push(fillTextRenderTime);
+        updateAverageTimes(glyphRenderTimes, fillTextRenderTimes, i + 1, iterations);
+    }
+
     for (let i = 0; i < iterations; i++) {
         const glyphRenderTime = await measureRenderTime(ctx, renderGridWithGlyphRenderer);
         glyphRenderTimes.push(glyphRenderTime);
-
-        const fillTextRenderTime = await measureRenderTime(ctx2, renderGridWithFillText);
-        fillTextRenderTimes.push(fillTextRenderTime);
-
         updateAverageTimes(glyphRenderTimes, fillTextRenderTimes, i + 1, iterations);
     }
+
+    console.log("done");
 }
 
 window.addEventListener('load', function() {

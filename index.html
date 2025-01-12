@@ -14,8 +14,9 @@
         #renderTimes {
             display: grid;
             grid-template-columns: auto auto;
-            gap: 10px;
+            gap: 1px;
             margin-top: 10px;
+            margin-bottom: 10px;
             max-width: 420px;
         }
         #renderTimes div {
@@ -25,19 +26,19 @@
     </style>
 </head>
 <body>
-    <div>GlyphRenderer</div>
-    <canvas id="myCanvas" width="2400" height="560"></canvas>
-    <div>FillTextRenderer</div>
-    <canvas id="myCanvas2" width="2400" height="560"></canvas>
     <button id="rerenderButton">Re-run Render Tests</button>
     <div id="renderTimes">
         <div>Current iteration:</div>
         <div id="currentIteration"></div>
-        <div>GlyphRenderer average time:</div>
-        <div id="glyphRenderTime"></div>
         <div>fillText average time:</div>
         <div id="fillTextRenderTime"></div>
+        <div>GlyphRenderer average time:</div>
+        <div id="glyphRenderTime"></div>
     </div>
+    <div>FillTextRenderer</div>
+    <canvas id="myCanvas2" width="2400" height="560"></canvas>
+    <div>GlyphRenderer</div>
+    <canvas id="myCanvas" width="2400" height="560"></canvas>
     <script type="module" src="script.js"></script>
 </body>
 </html>

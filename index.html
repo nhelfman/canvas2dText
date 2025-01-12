@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Canvas 2D Text</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <style>
         body {
             font-family: Arial, sans-serif;
         }
-        #myCanvas, #myCanvas2 {
+        #myCanvas, #fillTextCanvas {
             border: 1px solid black;
         }
         #renderTimes {
@@ -23,10 +24,35 @@
             padding: 5px;
             border: 1px solid #ccc;
         }
+        #rendererSelection {
+            display: flex;
+            align-items: center;
+            margin-left: 10px;
+        }
+        #rendererContainer {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        #rendererSelection label {
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
-    <button id="rerenderButton">Re-run Render Tests</button>
+    <div id="rendererContainer">
+        <button id="rerenderButton">Re-run Render Tests</button>
+        <div id="rendererSelection">
+            <label>
+                <input type="radio" name="renderer" value="putImage" checked>
+                putImageData renderer
+            </label>
+            <label>
+                <input type="radio" name="renderer" value="drawImage">
+                drawImage renderer
+            </label>
+        </div>
+    </div>
     <div id="renderTimes">
         <div>Current iteration:</div>
         <div id="currentIteration"></div>
@@ -36,7 +62,7 @@
         <div id="glyphRenderTime"></div>
     </div>
     <div>FillTextRenderer</div>
-    <canvas id="myCanvas2" width="2400" height="560"></canvas>
+    <canvas id="fillTextCanvas" width="2400" height="560"></canvas>
     <div>GlyphRenderer</div>
     <canvas id="myCanvas" width="2400" height="560"></canvas>
     <script type="module" src="script.js"></script>

@@ -1,4 +1,5 @@
-import GlyphRenderer from './glyphRenderer.js';
+import putImageGlyphRenderer from './putImageDataGlyphRenderer.js';
+import drawImageGlyphRenderer from './drawImageGlyphRenderer.js';
 
 // Add your JavaScript code here
 console.log("JavaScript file is linked successfully.");
@@ -10,11 +11,20 @@ function getRandomCharacter() {
 }
 
 // Render text
-function renderGridWithGlyphRenderer(ctx) {
+function renderGridWithPutImage(ctx) {
     const char = getRandomCharacter();
     for (let i = 0; i < 30; i++) {
         for (let j = 0; j < 28; j++) {
-            GlyphRenderer.render(ctx, `${char}: ${i}_${j}`, i * 80, j * 20);
+            putImageGlyphRenderer.render(ctx, `${char}: ${i}_${j}`, i * 80, j * 20);
+        }
+    }
+}
+
+function renderGridWithDrawImage(ctx) {
+    const char = getRandomCharacter();
+    for (let i = 0; i < 30; i++) {
+        for (let j = 0; j < 28; j++) {
+            drawImageGlyphRenderer.render(ctx, `${char}: ${i}_${j}`, i * 80, j * 20);
         }
     }
 }
@@ -67,31 +77,48 @@ function updateAverageTimesText(glyphRenderText, fillTextRenderText, iteration, 
 async function renderTests(iterations = 50) {
     const canvas = document.getElementById("myCanvas");
     const ctx = canvas.getContext("2d");
-    const canvas2 = document.getElementById("myCanvas2");
-    const ctx2 = canvas2.getContext("2d");
+    const fillTextCanvas = document.getElementById("fillTextCanvas");
+    const fillTextCtx = fillTextCanvas.getContext("2d");
 
     // Initialize with desired font and color
-    GlyphRenderer.init(ctx, "16px monospace", "black");
+    putImageGlyphRenderer.init(ctx, "16px monospace", "black");
+    drawImageGlyphRenderer.init(ctx, "16px monospace", "black");
 
     let glyphRenderTimes = [];
     let fillTextRenderTimes = [];
 
+    // select render test function based on the selected radio button
+    const selectedTest = document.querySelector('input[name="renderer"]:checked').value;
+    let renderFunction = undefined;
+    switch(selectedTest) {
+        case "putImage":
+            renderFunction = renderGridWithPutImage;
+            break;
+        case "drawImage":
+            renderFunction = renderGridWithDrawImage;
+            break;
+        default:
+            throw new Error("Invalid test selected");
+    }
+
     // warmup iterations
     updateAverageTimesText("Warmup", "Warmup");
     for (let i = 0; i < 10; i++) {
-        await measureRenderTime(ctx, renderGridWithGlyphRenderer);
-        await measureRenderTime(ctx2, renderGridWithFillText);
+        await measureRenderTime(ctx, renderFunction);
+        await measureRenderTime(fillTextCtx, renderGridWithFillText);
     }
 
     // run tests
     for (let i = 0; i < iterations; i++) {
-        const fillTextRenderTime = await measureRenderTime(ctx2, renderGridWithFillText);
+        const fillTextRenderTime = await measureRenderTime(fillTextCtx, renderGridWithFillText);
         fillTextRenderTimes.push(fillTextRenderTime);
         updateAverageTimes(glyphRenderTimes, fillTextRenderTimes, i + 1, iterations);
     }
 
+
+
     for (let i = 0; i < iterations; i++) {
-        const glyphRenderTime = await measureRenderTime(ctx, renderGridWithGlyphRenderer);
+        const glyphRenderTime = await measureRenderTime(ctx, renderFunction);
         glyphRenderTimes.push(glyphRenderTime);
         updateAverageTimes(glyphRenderTimes, fillTextRenderTimes, i + 1, iterations);
     }

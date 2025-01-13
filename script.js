@@ -40,7 +40,7 @@ function renderGridWithOpenType(ctx) {
 }
 
 function renderGridWithFillText(ctx) {
-    ctx.font = "16px monospace";
+    ctx.font = "OpenSans 20px monospace";
     ctx.fillStyle = "black";
     const char = getRandomCharacter();
     for (let i = 0; i < 30; i++) {
@@ -91,9 +91,9 @@ async function renderTests(iterations = 50) {
     const fillTextCtx = fillTextCanvas.getContext("2d");
 
     // Initialize with desired font and color
-    putImageGlyphRenderer.init(ctx, "16px monospace", "black");
-    drawImageGlyphRenderer.init(ctx, "16px monospace", "black");
-    await openTypeGlyphRenderer.init(ctx, './OpenSans-Regular.ttf', 14, "black");
+    putImageGlyphRenderer.init(ctx, "OpenSans 20px monospace", "black");
+    drawImageGlyphRenderer.init(ctx, "OpenSans 20px monospace", "black");
+    await openTypeGlyphRenderer.init(ctx, './OpenSans-Regular.ttf', 10, "black");
 
 
     let glyphRenderTimes = [];

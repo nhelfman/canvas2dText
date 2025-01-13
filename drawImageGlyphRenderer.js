@@ -1,5 +1,5 @@
 let glyphMap = {}; // Holds pre-rendered glyphs
-let glyphWidth = 12; // Width of each glyph (assuming fixed width)
+let glyphWidth = 10; // Width of each glyph (assuming fixed width)
 let glyphHeight = 16; // Height of each glyph
 
 // Initialize glyph renderer

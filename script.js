@@ -128,23 +128,23 @@ async function renderTests(iterations = 50) {
     }
 
     // warmup iterations
-    // updateAverageTimesText("Warmup", "Warmup");
-    // for (let i = 0; i < 10; i++) {
-    //     await measureRenderTime(ctx, renderFunction);
-    //     await measureRenderTime(fillTextCtx, renderGridWithFillText);
-    // }
+    updateAverageTimesText("Warmup", "Warmup");
+    for (let i = 0; i < 10; i++) {
+        await measureRenderTime(ctx, renderFunction);
+        await measureRenderTime(fillTextCtx, renderGridWithFillText);
+    }
 
     // run tests
     for (let i = 0; i < iterations; i++) {
         const fillTextRenderTime = await measureRenderTime(fillTextCtx, renderGridWithFillText);
         fillTextRenderTimes.push(fillTextRenderTime);
-        updateAverageTimes(glyphRenderTimes, fillTextRenderTimes, i + 1, iterations);
+        await updateAverageTimes(glyphRenderTimes, fillTextRenderTimes, i + 1, iterations);
     }
 
     for (let i = 0; i < iterations; i++) {
         const glyphRenderTime = await measureRenderTime(ctx, renderFunction);
         glyphRenderTimes.push(glyphRenderTime);
-        updateAverageTimes(glyphRenderTimes, fillTextRenderTimes, i + 1, iterations);
+        await updateAverageTimes(glyphRenderTimes, fillTextRenderTimes, i + 1, iterations);
     }
 
     console.log("done");
@@ -154,5 +154,5 @@ window.addEventListener('load', function() {
     renderTests(1);
 
     const rerenderButton = document.getElementById("rerenderButton");
-    rerenderButton.addEventListener("click", () => renderTests(10));
+    rerenderButton.addEventListener("click", () => renderTests(50));
 });

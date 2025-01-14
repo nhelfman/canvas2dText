@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--
+    This demo helps evaluating impact of imageBitmaps on memory usage
+
+    It generates and caches many random bitmap images every time user presses "Start" button.
+    It then draws these images on canvas one by one to see that they are correctly rendered.
+    -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ImageBitmap memory test</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <button onclick="stressTest()">Start</button>
+    <span id="bitmapCount"></span>
+    <canvas id="myCanvas" width="1920" height="560"></canvas>
+
+    <script>
+        const bitmapCache = new Map();        
+
+        async function yieldToNextFrame() {
+            return new Promise((resolve) => requestAnimationFrame(resolve));
+        }
+        
+        function drawRandomRectangles(ctx, width, height, count) {
+            // clear canvas
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, width, height);
+
+            for (let i = 0; i < count; i++) {
+                const x = Math.random() * width;
+                const y = Math.random() * height;
+                const rectWidth = Math.random() * 100;
+                const rectHeight = Math.random() * 100;
+                const color = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
+                ctx.fillStyle = color;
+
+                // render at random either circle or rectangle
+                if (Math.random() > 0.5) {
+                    ctx.beginPath();
+                    ctx.arc(x, y, rectWidth / 2, 0, 2 * Math.PI);
+                    ctx.fill();
+                } else {
+                    ctx.fillRect(x, y, rectWidth, rectHeight);
+                }
+            }
+        }
+
+        async function makeImageBitmaps(offCtx, width, height, count) {
+            const bitmaps = [];
+            for (let i = 0; i < count; i++) {
+                drawRandomRectangles(offCtx, width, height, 50);
+                bitmaps.push(offCtx.canvas.transferToImageBitmap());
+
+                if(i % 10 === 0) {
+                    document.getElementById('bitmapCount').innerText = `Bitmaps: ${bitmapCache.size + bitmaps.length}`;
+                    await yieldToNextFrame();
+                }
+            }
+
+            document.getElementById('bitmapCount').innerText = `Bitmaps: ${bitmapCache.size + bitmaps.length}`;
+
+            return bitmaps;
+        }
+
+        function main() {
+            const canvas = document.getElementById('myCanvas');
+            canvas.addEventListener("contextlost", (event) => {
+                console.log('Canvas Context lost');
+                event.preventDefault();
+            });
+        }
+        
+        async function stressTest() {
+            const totalImages = 1000;
+            const offscreen = new OffscreenCanvas(1920, 560);
+            const offCtx = offscreen.getContext('2d');
+
+            const bitmaps = await makeImageBitmaps(offCtx, 1920, 560, totalImages);
+            bitmaps.forEach(bmp => bitmapCache.set(Math.random(), bmp));
+
+            // draw image on canvas
+            const canvas = document.getElementById('myCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            for(let i = 1; i < bitmaps.length; i++) {
+                ctx.drawImage(bitmaps[i], 0, 0);
+                await yieldToNextFrame();
+            }
+        }
+
+        main();
+        
+    </script>
+</body>
+</html>

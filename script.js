@@ -1,6 +1,7 @@
 import putImageGlyphRenderer from './putImageDataGlyphRenderer.js';
 import drawImageGlyphRenderer from './drawImageGlyphRenderer.js';
 import openTypeGlyphRenderer from './openTypeGlyphRenderer.js';
+import parallelGridRenderer from './parallelGridRenderer.js';
 
 // Add your JavaScript code here
 console.log("JavaScript file is linked successfully.");
@@ -39,6 +40,11 @@ function renderGridWithOpenType(ctx) {
     }
 }
 
+async function renderGridInParallel(ctx) {
+    const char = getRandomCharacter();
+    await parallelGridRenderer.renderGrid(ctx, char);
+}
+
 function renderGridWithFillText(ctx) {
     ctx.font = "OpenSans 20px monospace";
     ctx.fillStyle = "black";
@@ -58,8 +64,10 @@ async function measureRenderTime(ctx, renderFunction) {
     await yieldToNextFrame();
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     const startRender = performance.now();
-    renderFunction(ctx);
+    await renderFunction(ctx);
     const endRender = performance.now();
+
+    await yieldToNextFrame();
     return endRender - startRender;
 }
 
@@ -94,7 +102,7 @@ async function renderTests(iterations = 50) {
     putImageGlyphRenderer.init(ctx, "OpenSans 20px monospace", "black");
     drawImageGlyphRenderer.init(ctx, "OpenSans 20px monospace", "black");
     await openTypeGlyphRenderer.init(ctx, './OpenSans-Regular.ttf', 10, "black");
-
+    parallelGridRenderer.init();
 
     let glyphRenderTimes = [];
     let fillTextRenderTimes = [];
@@ -112,16 +120,19 @@ async function renderTests(iterations = 50) {
         case "openType":
             renderFunction = renderGridWithOpenType;
             break;
+        case "parallel":
+            renderFunction = renderGridInParallel;
+            break;
         default:
             throw new Error("Invalid test selected");
     }
 
     // warmup iterations
-    updateAverageTimesText("Warmup", "Warmup");
-    for (let i = 0; i < 10; i++) {
-        await measureRenderTime(ctx, renderFunction);
-        await measureRenderTime(fillTextCtx, renderGridWithFillText);
-    }
+    // updateAverageTimesText("Warmup", "Warmup");
+    // for (let i = 0; i < 10; i++) {
+    //     await measureRenderTime(ctx, renderFunction);
+    //     await measureRenderTime(fillTextCtx, renderGridWithFillText);
+    // }
 
     // run tests
     for (let i = 0; i < iterations; i++) {
@@ -140,8 +151,8 @@ async function renderTests(iterations = 50) {
 }
 
 window.addEventListener('load', function() {
-    renderTests(10);
+    renderTests(1);
 
     const rerenderButton = document.getElementById("rerenderButton");
-    rerenderButton.addEventListener("click", () => renderTests(50));
+    rerenderButton.addEventListener("click", () => renderTests(10));
 });

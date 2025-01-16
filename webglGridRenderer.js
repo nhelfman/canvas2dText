@@ -1,5 +1,6 @@
 import Text from "https://esm.sh/gl-text";
 
+
 let glText;
 let offScreen;
 let offScreenCtx;
@@ -13,6 +14,14 @@ function init(canvas) {
 
     offScreenCtx = offScreen.getContext('webgl');
     glText = new Text(offScreenCtx);
+
+    // prepare atlas of glyphs
+    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!? _:"; // Supported chars
+    glText.update({ 
+        text: chars, 
+        font: '12px Helvetica, sans-serif',
+        kerning: false
+    });
 }
 
 function renderGrid(char) {

@@ -2,6 +2,7 @@ import putImageGlyphRenderer from './putImageDataGlyphRenderer.js';
 import drawImageGlyphRenderer from './drawImageGlyphRenderer.js';
 import openTypeGlyphRenderer from './openTypeGlyphRenderer.js';
 import parallelGridRenderer from './parallelGridRenderer.js';
+import webglGridRenderer from './webglGridRenderer.js';
 
 // Add your JavaScript code here
 console.log("JavaScript file is linked successfully.");
@@ -43,6 +44,11 @@ function renderGridWithOpenType(ctx) {
 async function renderGridInParallel(ctx) {
     const char = getRandomCharacter();
     await parallelGridRenderer.renderGrid(ctx, char);
+}
+
+async function renderGridWithWebGL(ctx) {
+    const char = getRandomCharacter();
+    webglGridRenderer.renderGrid(char);
 }
 
 function renderGridWithFillText(ctx) {
@@ -97,12 +103,14 @@ async function renderTests(iterations = 50) {
     const ctx = canvas.getContext("2d");
     const fillTextCanvas = document.getElementById("fillTextCanvas");
     const fillTextCtx = fillTextCanvas.getContext("2d");
+    const glCanvas = document.getElementById("glCanvas");
 
     // Initialize with desired font and color
     putImageGlyphRenderer.init(ctx, "OpenSans 20px monospace", "black");
     drawImageGlyphRenderer.init(ctx, "OpenSans 20px monospace", "black");
     await openTypeGlyphRenderer.init(ctx, './OpenSans-Regular.ttf', 10, "black");
     parallelGridRenderer.init();
+    webglGridRenderer.init(glCanvas);
 
     let glyphRenderTimes = [];
     let fillTextRenderTimes = [];
@@ -113,15 +121,28 @@ async function renderTests(iterations = 50) {
     switch(selectedTest) {
         case "putImage":
             renderFunction = renderGridWithPutImage;
+            canvas.style.display = 'block';
+            glCanvas.style.display = 'none';
             break;
         case "drawImage":
             renderFunction = renderGridWithDrawImage;
+            canvas.style.display = 'block';
+            glCanvas.style.display = 'none';
             break;
         case "openType":
             renderFunction = renderGridWithOpenType;
+            canvas.style.display = 'block';
+            glCanvas.style.display = 'none';
             break;
         case "parallel":
             renderFunction = renderGridInParallel;
+            canvas.style.display = 'block';
+            glCanvas.style.display = 'none';
+            break;
+        case "webgl":
+            renderFunction = renderGridWithWebGL;
+            canvas.style.display = 'none';
+            glCanvas.style.display = 'block';
             break;
         default:
             throw new Error("Invalid test selected");

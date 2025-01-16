@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebGL Text</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="glCanvas" width="1920" height="560"></canvas>
+
+    <script type="module">
+        import Text from "https://esm.sh/gl-text@1.4.0";
+
+        const canvas = document.getElementById('glCanvas');
+        let text1 = new Text(canvas.getContext('webgl'));
+
+        function getRandomCharacter() {
+            return String.fromCharCode(Math.floor(Math.random() * 26) + 65);
+        }
+
+        function renderGrid() {
+            const positions = [];
+            const cells = [];
+
+            const char = getRandomCharacter();
+            for (let i = 0; i < 30; i++) {
+                for (let j = 0; j < 28; j++) {
+                    const cellText = `${char}: ${i}_${j}`;
+                    cells.push(cellText);
+
+                    const position = [i * 50, j * 20];
+                    positions.push(position);
+                }
+            }
+
+            text1.update({
+                        position: positions,
+                        text: cells,
+                        font: '12px Helvetica, sans-serif'
+                    });
+
+            text1.render();
+        }
+        
+        for(let i = 0; i < 100; i++) {
+            setTimeout(() => {
+                renderGrid();
+            }, i*30);
+        }
+   
+    </script>
+    
+  
+</body>
+</html>

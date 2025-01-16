@@ -37,11 +37,20 @@
         #rendererSelection label {
             margin-right: 10px;
         }
+        #iterationsInput {
+            width: 40px;
+            margin-left: 10px;
+        }
+        #rerenderButton {
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
     <div id="rendererContainer">
-        <button id="rerenderButton">Re-run Render Tests</button>
+        <button id="rerenderButton">Run</button>
+        <label for="iterationsInput">#:</label>
+        <input type="number" id="iterationsInput" value="50" min="1">
         <div id="rendererSelection">
             <label>
                 <input type="radio" name="renderer" value="putImage" checked>
@@ -64,6 +73,7 @@
                 WebGL renderer
             </label>
         </div>
+
     </div>
     <div id="renderTimes">
         <div>Current iteration:</div>

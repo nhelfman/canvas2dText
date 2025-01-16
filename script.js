@@ -98,7 +98,7 @@ function updateAverageTimesText(glyphRenderText, fillTextRenderText, iteration, 
     }
 }
 
-async function renderTests(iterations = 50) {
+async function renderTests(iterations) {
     const canvas = document.getElementById("myCanvas");
     const ctx = canvas.getContext("2d");
     const fillTextCanvas = document.getElementById("fillTextCanvas");
@@ -161,8 +161,12 @@ async function renderTests(iterations = 50) {
 }
 
 window.addEventListener('load', function() {
-    renderTests(1);
+    const iterationsInput = document.getElementById("iterationsInput");
+    renderTests(parseInt(iterationsInput.value, 10) || 50);
 
     const rerenderButton = document.getElementById("rerenderButton");
-    rerenderButton.addEventListener("click", () => renderTests(50));
+    rerenderButton.addEventListener("click", () => {
+        const iterations = parseInt(iterationsInput.value, 10) || 50;
+        renderTests(iterations);
+    });
 });

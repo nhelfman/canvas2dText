@@ -1,12 +1,24 @@
 import Text from "https://esm.sh/gl-text";
 
 let glText;
+let offScreen;
+let offScreenCtx;
+let targetCanvas;
+let targetCtx; 
 
 function init(canvas) {
-    glText = new Text(canvas.getContext('webgl'));
+    targetCanvas = canvas;
+    targetCtx = targetCanvas.getContext('2d');
+    offScreen = new OffscreenCanvas(targetCanvas.width, targetCanvas.height);
+
+    offScreenCtx = offScreen.getContext('webgl');
+    glText = new Text(offScreenCtx);
 }
 
 function renderGrid(char) {
+    // clear offscreen canvas
+    clearCanvas(offScreenCtx);
+
     const positions = [];
     const cells = [];
 
@@ -28,6 +40,15 @@ function renderGrid(char) {
     });
 
     glText.render();
+
+    targetCtx.drawImage(offScreen, 0, 0);
+}
+
+function clearCanvas(gl) {
+    // Set the clear color to black, fully opaque
+    gl.clearColor(1.0, 1.0, 1.0, 1.0);
+    // Clear the color buffer with specified clear color
+    gl.clear(gl.COLOR_BUFFER_BIT);
 }
 
 export default { init, renderGrid };

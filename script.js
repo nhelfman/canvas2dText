@@ -103,14 +103,13 @@ async function renderTests(iterations = 50) {
     const ctx = canvas.getContext("2d");
     const fillTextCanvas = document.getElementById("fillTextCanvas");
     const fillTextCtx = fillTextCanvas.getContext("2d");
-    const glCanvas = document.getElementById("glCanvas");
 
     // Initialize with desired font and color
     putImageGlyphRenderer.init(ctx, "OpenSans 20px monospace", "black");
     drawImageGlyphRenderer.init(ctx, "OpenSans 20px monospace", "black");
     await openTypeGlyphRenderer.init(ctx, './OpenSans-Regular.ttf', 10, "black");
     parallelGridRenderer.init();
-    webglGridRenderer.init(glCanvas);
+    webglGridRenderer.init(canvas);
 
     let glyphRenderTimes = [];
     let fillTextRenderTimes = [];
@@ -121,28 +120,18 @@ async function renderTests(iterations = 50) {
     switch(selectedTest) {
         case "putImage":
             renderFunction = renderGridWithPutImage;
-            canvas.style.display = 'block';
-            glCanvas.style.display = 'none';
             break;
         case "drawImage":
             renderFunction = renderGridWithDrawImage;
-            canvas.style.display = 'block';
-            glCanvas.style.display = 'none';
             break;
         case "openType":
             renderFunction = renderGridWithOpenType;
-            canvas.style.display = 'block';
-            glCanvas.style.display = 'none';
             break;
         case "parallel":
             renderFunction = renderGridInParallel;
-            canvas.style.display = 'block';
-            glCanvas.style.display = 'none';
             break;
         case "webgl":
             renderFunction = renderGridWithWebGL;
-            canvas.style.display = 'none';
-            glCanvas.style.display = 'block';
             break;
         default:
             throw new Error("Invalid test selected");

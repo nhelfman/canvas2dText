@@ -169,4 +169,10 @@ window.addEventListener('load', function() {
         const iterations = parseInt(iterationsInput.value, 10) || 50;
         renderTests(iterations);
     });
+
+    document.querySelectorAll('input[name="renderer"]').forEach((input) => {
+        input.addEventListener('change', (event) => {
+            document.getElementById('selectedRenderer').textContent = event.target.value;
+        });
+    });
 });

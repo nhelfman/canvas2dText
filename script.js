@@ -98,7 +98,12 @@ function updateAverageTimesText(glyphRenderText, fillTextRenderText, iteration, 
     }
 }
 
+let abortController = new AbortController();
+
 async function renderTests(iterations) {
+    abortController = new AbortController();
+    const signal = abortController.signal;
+
     const canvas = document.getElementById("myCanvas");
     const ctx = canvas.getContext("2d");
     const fillTextCanvas = document.getElementById("fillTextCanvas");
@@ -140,18 +145,30 @@ async function renderTests(iterations) {
     // warmup iterations
     updateAverageTimesText("Warmup", "Warmup");
     for (let i = 0; i < 10; i++) {
+        if (signal.aborted) {
+            updateAverageTimesText("Aborted", "Aborted");
+            return;
+        }
         await measureRenderTime(ctx, renderFunction);
         await measureRenderTime(fillTextCtx, renderGridWithFillText);
     }
 
     // run tests
     for (let i = 0; i < iterations; i++) {
+        if (signal.aborted) {
+            updateAverageTimesText("Aborted", "Aborted");
+            return;
+        }
         const fillTextRenderTime = await measureRenderTime(fillTextCtx, renderGridWithFillText);
         fillTextRenderTimes.push(fillTextRenderTime);
         await updateAverageTimes(glyphRenderTimes, fillTextRenderTimes, i + 1, iterations);
     }
 
     for (let i = 0; i < iterations; i++) {
+        if (signal.aborted) {
+            updateAverageTimesText("Aborted", "Aborted");
+            return;
+        }
         const glyphRenderTime = await measureRenderTime(ctx, renderFunction);
         glyphRenderTimes.push(glyphRenderTime);
         await updateAverageTimes(glyphRenderTimes, fillTextRenderTimes, i + 1, iterations);
@@ -166,12 +183,14 @@ window.addEventListener('load', function() {
 
     const rerenderButton = document.getElementById("rerenderButton");
     rerenderButton.addEventListener("click", () => {
+        abortController.abort();
         const iterations = parseInt(iterationsInput.value, 10) || 50;
         renderTests(iterations);
     });
 
     document.querySelectorAll('input[name="renderer"]').forEach((input) => {
         input.addEventListener('change', (event) => {
+            abortController.abort();
             document.getElementById('selectedRenderer').textContent = event.target.value;
         });
     });

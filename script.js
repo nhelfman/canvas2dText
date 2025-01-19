@@ -179,7 +179,7 @@ async function renderTests(iterations) {
 
 window.addEventListener('load', function() {
     const iterationsInput = document.getElementById("iterationsInput");
-    renderTests(parseInt(iterationsInput.value, 10) || 50);
+    renderTests(1);
 
     const rerenderButton = document.getElementById("rerenderButton");
     rerenderButton.addEventListener("click", () => {
